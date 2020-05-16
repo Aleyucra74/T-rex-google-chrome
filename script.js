@@ -1,7 +1,17 @@
 document.addEventListener('keydown', function (evt) {
     if (evt.keyCode == 32) {
         console.log('pula');
-        pular();
+        if (nivel.mortes == false) {
+            pular();
+        }else {
+            nivel.velocidade = 9;
+            nuvem.velocidade = 1;
+            cactus.x = largura +100;
+            nuvem.x = largura + 100;
+            nivel.pontos = 0;
+            nivel.mortes = false;
+        }
+
     }
 });
 
@@ -50,7 +60,8 @@ var trex = {
 
 var nivel = {
     velocidade: 9,
-    pontos: 0
+    pontos: 0,
+    mortes: false
 };
 
 var cactus = {
@@ -60,7 +71,8 @@ var cactus = {
 
 var nuvem = {
     x:400,
-    y: 100
+    y: 100,
+    velocidade:1
 };
 
 var soloG = {
@@ -80,6 +92,7 @@ function desenharCactus() {
 function logicaCactus() {
     if(cactus.x < -100) {
         cactus.x = largura+100;
+        nivel.pontos++;
     }else{
         cactus.x -= nivel.velocidade;
     }
@@ -94,7 +107,7 @@ function logicaNuvem() {
     if(nuvem.x < -100) {
         nuvem.x = largura+100;
     }else{
-        nuvem.x -= 2;
+        nuvem.x -= nuvem.velocidade;
     }
 }
 //-----------------------
@@ -130,6 +143,27 @@ function gravidade() {
     }
 }
 
+function colisao() {
+    if(cactus.x >= 100 && cactus.x <= 150) {
+        if (trex.y >= solo-25) {
+            nivel.mortes = true;
+            nivel.velocidade = 0;
+            nuvem.velocidade = 0;
+        }
+    }
+}
+
+function pontuacao() {
+    ctx.font = '30px impact';
+    ctx.fillStyle = '#555555';
+    ctx.fillText(`${nivel.pontos}`,600,50);
+
+    if (nivel.mortes == true) {
+        ctx.font = '60px impact';
+        ctx.fillText(`GAME OVER`,240,150);
+    }
+}
+
 //ciclo principal
 var FPS = 50;
 setInterval(function () {
@@ -141,6 +175,7 @@ setInterval(function () {
 function principal() {
     apagarCanvas();
     gravidade();
+    colisao();
     logicaCactus();
     logicaNuvem();
     logicaSolo();
@@ -148,4 +183,5 @@ function principal() {
     desenharNuvem();
     desenharCactus();
     desenharRex();
+    pontuacao();
 }
